@@ -1,0 +1,2225 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API продавца",
+    "version": "2.4",
+    "x-logo": {
+      "url": "./lang/ru.png",
+      "altText": "ru",
+      "href": "./en/index.html"
+    },
+    "description": "# Общее описание Wildberries API предоставляет продавцам возможность управления магазином и получения оперативной и статистической информации по протоколу HTTP RestAPI. Описание API предоставляется в формате [Swagger](https://swagger.io/) (Open API) и может быть использовано для импорта в другие инструменты (такие как PostMan) или генерации клиентского кода на различных языках программирования с помощью [Swagger CodeGen](https://swagger.io/tools/swagger-codegen/) Описание в оригинальном swagger-формате swagger OpenAPI-файл swagger.yaml Для ручной проверки API вы можете использовать: Под ОС Windows - [PostMan](https://www.postman.com/) Под ОС Linux - [curl](https://curl.se/) ## Поддержка Техническая поддержка осуществляется через диалоги в личном кабинете продавца. При создании нового обращения в техподдержку используйте категорию API. Новости и изменения, касающиеся API, публикуются в [новостной ленте Wildberries](https://seller.wildberries.ru/news). ## Авторизация Авторизация осуществляется по токенам API, которые владелец личного кабинета (главный пользователь) самостоятельно генерирует в разделе [Профиль --> Настройки --> Доступ к API](https://seller.wildberries.ru/supplier-settings/access-to-api). Существует три типа токенов: Стандартный. Используется для работы с методами из разделов: Цены, Промокоды и скидки, Контент, Marketplace, Рекомендации, Отзывы, Вопросы. Статистика. Используется для работы с методами из раздела Статистика. Реклама. Используется для работы с методами из раздела Реклама. Обратите внимание, что токен отображается ТОЛЬКО в момент создания. Его надо сохранить, потому что больше его отобразить будет нельзя. Созданный токен следует добавлять в каждый запрос, прибавляя к запросу заголовок (http-header) формата `Authorization: .........`. ## Форматы ### Дата и время Во всех методах API статистики дата и время передаются в формате [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339). В большинстве случаев вы можете передать дату или дату со временем. Если время не указано, оно принимается равным 00:00:00. Время можно указывать с точностью до секунд или миллисекунд. Литера `Z` в конце строки означает часовой пояс UTC. При ее отсутствии время считается в часовом поясе МСК (UTC+3). Примеры: `2019-06-20` `2019-06-20T00:00:00Z` `2019-06-20T23:59:59` `2019-06-20T00:00:00.12345Z` `2019-06-20T00:00:00.12345` `2017-03-25T00:00:00` ## Release Notes Для просмотра обновлений перейдите по ссылке."
+  },
+  "x-tagGroups": [
+    {
+      "name": "Реклама",
+      "tags": [
+        "Реклама"
+      ]
+    }
+  ],
+  "security": [
+    {
+      "HeaderApiKey": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "HeaderApiKey": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "TokenMissing": {
+        "description": "Токен отсутствует",
+        "type": "string",
+        "example": "proxy: unauthorized"
+      },
+      "TokenInvalid": {
+        "description": "Токен недействителен",
+        "type": "string",
+        "example": "proxy: invalid token"
+      },
+      "TokenNotFound": {
+        "description": "Токен удален",
+        "type": "string",
+        "example": "proxy: not found"
+      },
+      "Error": {
+        "type": "object",
+        "nullable": false,
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Код ошибки",
+            "nullable": false
+          },
+          "message": {
+            "type": "string",
+            "description": "Описание ошибки",
+            "nullable": false
+          },
+          "data": {
+            "type": "object",
+            "description": "Дополнительные данные, обогащающие ошибку",
+            "nullable": true
+          }
+        }
+      },
+      "StatusNoChange": {
+        "type": "string",
+        "example": "Статус кампании не изменен"
+      },
+      "IncorrectSupplierId": {
+        "type": "string",
+        "example": "Некорректный идентификатор продавца"
+      },
+      "InvalidRcId": {
+        "type": "string",
+        "example": "Некорректный идентификатор РК"
+      },
+      "IncorrectParam": {
+        "type": "string",
+        "example": "Некорректное значение параметра param"
+      },
+      "IncorrectActive": {
+        "type": "string",
+        "example": "Некорректное значение параметра active"
+      },
+      "IncorrectSubjectID": {
+        "type": "string",
+        "example": "Некорректное значение параметра subjectId"
+      },
+      "IncorrectType": {
+        "type": "string",
+        "example": "Некорректное значение параметра type"
+      },
+      "IncorrectStatus": {
+        "type": "string",
+        "example": "Некорректное значение параметра status"
+      },
+      "IncorrectName": {
+        "type": "string",
+        "example": "Некорректное название"
+      },
+      "IncorrectNumDisplayIntervals": {
+        "type": "string",
+        "example": "Некорректное количество интервалов показов (max. 24)"
+      },
+      "IncorrectDisplayInterval": {
+        "type": "string",
+        "example": "Некорректные значения интервалов показов"
+      },
+      "IncorrectNumItems": {
+        "type": "string",
+        "example": "Некорректное количество номенклатур в запросе (max. 50)"
+      },
+      "IncorrectNm": {
+        "type": "string",
+        "example": "Некорректное значение параметра nm"
+      },
+      "IncorrectCpm": {
+        "type": "string",
+        "example": "Некорректное значение параметра cpm"
+      },
+      "AmountNotChanged": {
+        "type": "string",
+        "example": "Размер ставки не изменен"
+      },
+      "CampaignIntervalsNotChanged": {
+        "type": "string",
+        "example": "Интервалы показов кампании не изменены"
+      },
+      "ActivityNomNotChanged": {
+        "type": "string",
+        "example": "Активность номенклатур(-ы) не изменена"
+      },
+      "ActivitySubjectGroupNotChanged": {
+        "type": "string",
+        "example": "Активность предметной группы не изменена"
+      },
+      "CompanyNameChangeErr": {
+        "type": "string",
+        "example": "Ошибка изменения названия кампании"
+      },
+      "DisplayIntervalError": {
+        "type": "string",
+        "example": "Ошибка изменения интервалов показа"
+      },
+      "ErrorProcesRequestParam": {
+        "type": "string",
+        "example": "Ошибка обработки параметров запроса"
+      },
+      "RequestBodyProcessError": {
+        "type": "string",
+        "example": "Ошибка обработки тела запроса"
+      }
+    },
+    "parameters": {},
+    "requestBodies": {},
+    "examples": {},
+    "responses": {}
+  },
+  "tags": [
+    {
+      "name": "Реклама",
+      "description": "Словарь сокращений: РК - рекламная кампания Синхронизация данных из бд происходит раз в 3 минуты. Изменение статуса происходит раз в 1 минуту. Внутри этого интервала будет сохранено последнее действие по изменению статуса. Изменение ставки происходит раз в 30 секунд. Внутри этого интервала будет сохранено последнее действие по изменению ставки."
+    }
+  ],
+  "paths": {
+    "/adv/v0/count": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Получение РК",
+        "description": "Получение количества рекламных кампаний (РК) поставщика",
+        "tags": [
+          "Реклама"
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "all": {
+                      "description": "Общее количество РК всех статусов и типов",
+                      "type": "integer",
+                      "example": 99
+                    },
+                    "adverts": {
+                      "description": "Массив РК",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "description": "Тип РК: 4 - реклама в каталоге 5 - реклама в карточке товара 6 - реклама в поиске 7 - реклама в рекомендациях на главной странице",
+                            "type": "integer",
+                            "example": 6
+                          },
+                          "status": {
+                            "description": "Статус РК: 7 - РК завершена 9 - идут показы 11 - РК на паузе",
+                            "type": "integer",
+                            "example": 11
+                          },
+                          "count": {
+                            "description": "Количество РК",
+                            "type": "integer",
+                            "example": 2
+                          }
+                        },
+                        "required": [
+                          "type",
+                          "status",
+                          "count"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "all",
+                    "adverts"
+                  ]
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncorrectSupplierId"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getRkCount"
+      }
+    },
+    "/adv/v0/adverts": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Список РК",
+        "description": "Метод позволяет получить список РК продавца.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Статус РК: 7 - РК завершена 9 - идут показы 11 - РК на паузе",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                7,
+                9,
+                11
+              ]
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Тип РК: 4 - реклама в каталоге 5 - реклама в карточке товара 6 - реклама в поиске 7 - реклама в рекомендациях на главной странице",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                4,
+                5,
+                6,
+                7
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Количество кампаний в ответе",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Смещение относительно первой РК",
+            "schema": {
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Порядок: create (по времени создания РК) change (по времени последнего изменения РК) id (по идентификатору РК) Например: **/api/v0/adverts?type=6&limit=5&offset=10&order=change&direction=asc**",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "create",
+                "change",
+                "id"
+              ]
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "description": "Направление: desc (от большего к меньшему) asc (от меньшего к большему) Например: **/api/v0/adverts?type=6&limit=5&offset=10&order=change&direction=asc**",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "desc",
+                "asc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "nullable": true,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "advertId": {
+                        "description": "Идентификатор РК",
+                        "type": "integer",
+                        "example": 456
+                      },
+                      "type": {
+                        "description": "Тип РК: 4 - реклама в каталоге 5 - реклама в карточке товара 6 - реклама в поиске 7 - реклама в рекомендациях на главной странице",
+                        "type": "integer",
+                        "example": 6
+                      },
+                      "status": {
+                        "description": "Статус РК: 7 - РК завершена 9 - идут показы 11 - РК на паузе",
+                        "type": "integer",
+                        "example": 11
+                      },
+                      "dailyBudget": {
+                        "description": "Сумма дневного бюджета new",
+                        "type": "integer"
+                      },
+                      "createTime": {
+                        "description": "Время создания РК",
+                        "type": "string",
+                        "example": "2022-03-09T10:50:21.831623+03:00"
+                      },
+                      "changeTime": {
+                        "description": "Время последнего изменения РК",
+                        "type": "string",
+                        "example": "2022-12-22T18:24:19.808701+03:00"
+                      },
+                      "startTime": {
+                        "description": "Время последнего запуска РК new",
+                        "type": "string",
+                        "example": "2022-03-09T12:50:21.831623+03:00"
+                      },
+                      "endTime": {
+                        "description": "Время завершения РК (state 7) new",
+                        "type": "string",
+                        "example": "2022-11-09T14:40:21.831623+03:00"
+                      }
+                    },
+                    "required": [
+                      "advertId",
+                      "name",
+                      "type",
+                      "status",
+                      "dailyBudget",
+                      "createTime",
+                      "changeTime",
+                      "startTime",
+                      "endTime"
+                    ]
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "204": {
+            "description": "Кампании не найдены"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/IncorrectType"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorProcesRequestParam"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "operationId": "getRks"
+      }
+    },
+    "/adv/v0/advert": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Информация о РК",
+        "description": "Получение информации об одной РК",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор РК",
+            "schema": {
+              "type": "integer",
+              "example": 1234
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "advertId": {
+                      "description": "Идентификатор РК",
+                      "type": "integer",
+                      "example": 1234
+                    },
+                    "type": {
+                      "description": "Тип РК: 4 - реклама в каталоге 5 - реклама в карточке товара 6 - реклама в поиске 7 - реклама в рекомендациях на главной странице",
+                      "type": "integer",
+                      "example": 4
+                    },
+                    "status": {
+                      "description": "Статус РК: 7 - РК завершена 9 - идут показы 11 - РК на паузе",
+                      "type": "integer",
+                      "example": 9
+                    },
+                    "dailyBudget": {
+                      "description": "Дневной бюджет, если не установлен, то 0",
+                      "type": "integer"
+                    },
+                    "createTime": {
+                      "description": "Время создания РК",
+                      "type": "string",
+                      "example": "2022-03-09T10:50:21.831623+03:00"
+                    },
+                    "changeTime": {
+                      "description": "Время последнего изменения РК",
+                      "type": "string",
+                      "example": "2022-12-22T18:24:19.808701+03:00"
+                    },
+                    "startTime": {
+                      "description": "Дата запуска РК",
+                      "type": "string"
+                    },
+                    "endTime": {
+                      "description": "Дата завершения РК",
+                      "type": "string"
+                    },
+                    "name": {
+                      "description": "Название РК",
+                      "type": "string"
+                    },
+                    "params": {
+                      "description": "Параметры РК",
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "subjectName": {
+                            "description": "Название предметной группы (для РК в поиске и рекомендациях)",
+                            "type": "string"
+                          },
+                          "active": {
+                            "description": "Флаг активности РК, true - активна, false - неактивна new",
+                            "type": "boolean"
+                          },
+                          "intervals": {
+                            "description": "Интервалы часов показа РК",
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "begin": {
+                                  "description": "Время начала показов",
+                                  "type": "integer"
+                                },
+                                "end": {
+                                  "description": "Время окончания показов",
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "begin",
+                                "end"
+                              ]
+                            }
+                          },
+                          "price": {
+                            "description": "Текущая ставка",
+                            "type": "integer"
+                          },
+                          "menuId": {
+                            "description": "Идентификатор меню, где размещается РК (для РК в каталоге)",
+                            "type": "integer"
+                          },
+                          "subjectId": {
+                            "description": "Идентификатор предметной группы, для которой создана РК (для РК в поиске и рекомендациях)",
+                            "type": "integer"
+                          },
+                          "setId": {
+                            "description": "Идентификатор сочетания предмета и пола (для РК в карточке товара)",
+                            "type": "integer"
+                          },
+                          "setName": {
+                            "description": "Сочетание предмета и пола (для РК в карточке товара)",
+                            "type": "string"
+                          },
+                          "menuName": {
+                            "description": "Название меню, где размещается РК (для РК в каталоге)"
+                          },
+                          "nms": {
+                            "description": "Массив номенклатур РК",
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "nm": {
+                                  "type": "integer",
+                                  "description": "Числовой идентификатор номенклатуры Wildberries (nmId)"
+                                },
+                                "active": {
+                                  "type": "boolean",
+                                  "description": "Состояние номенклатуры (true - активна или false - неактивна)"
+                                }
+                              },
+                              "required": [
+                                "nm",
+                                "active"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "intervals",
+                          "price"
+                        ]
+                      },
+                      "example": [
+                        {
+                          "subjectName": "Платья",
+                          "intervals": [
+                            {
+                              "Begin": 3,
+                              "End": 20
+                            }
+                          ],
+                          "dailyBudget": 0,
+                          "price": 50,
+                          "menuId": 776
+                        },
+                        {
+                          "subjectName": "Платья",
+                          "intervals": [],
+                          "dailyBudget": 1500,
+                          "price": 234,
+                          "menuId": 667
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "advertId",
+                    "name",
+                    "type",
+                    "status",
+                    "dailyBudget",
+                    "createTime",
+                    "changeTime",
+                    "startTime",
+                    "endTime",
+                    "params"
+                  ]
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "204": {
+            "description": "Кампания не найдена"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvalidRcId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getRk"
+      }
+    },
+    "/adv/v0/start": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Запуск РК",
+        "description": "РК в статусе \"11 - на паузе\" - можно снова запустить. Для запуска необходимо, чтобы у РК были активные ставки. GET на `/api/v0/start?id=***` - в ответ `200`, если статус изменен, или `400`, если это сделать не удалось.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор РК",
+            "schema": {
+              "type": "integer",
+              "example": 1234
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Статус изменен"
+          },
+          "400": {
+            "description": "Статус не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvalidRcId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Статус не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusNoChange"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "startRk"
+      }
+    },
+    "/adv/v0/pause": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Пауза РК",
+        "description": "РК в статусе \"9 - идут показы\" - можно запаузить, сделав GET на `/api/v0/pause?id=***`.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор РК",
+            "schema": {
+              "type": "integer",
+              "example": 1234
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Статус изменен"
+          },
+          "400": {
+            "description": "Статус не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvalidRcId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Статус не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusNoChange"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "pauseRk"
+      }
+    },
+    "/adv/v0/stop": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Завершение РК",
+        "description": "Метод позволяет завершить РК, находящиеся в статусе 9 или 11.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор РК",
+            "schema": {
+              "type": "integer",
+              "example": 1234
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Статус изменен"
+          },
+          "400": {
+            "description": "Статус не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvalidRcId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Статус не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusNoChange"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "stopRk"
+      }
+    },
+    "/adv/v0/cpm": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Список ставок",
+        "description": "Получение списка ставок для типа размещения. Данные в ответе отсортированы по величине ставки от большей к меньшей.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Тип РК: 4 - реклама в каталоге 5 - реклама в карточке товара 6 - реклама в поиске 7 - реклама в рекомендациях на главной странице",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                4,
+                5,
+                6,
+                7
+              ]
+            },
+            "required": true
+          },
+          {
+            "name": "param",
+            "in": "query",
+            "description": "Параметр запроса, по которому будет получен список ставок активных РК. Должен быть значением `menuId`, `subjectId` или `setId` в зависимости от типа РК.",
+            "schema": {
+              "type": "integer",
+              "example": 1234
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Count": {
+                        "description": "Количество ставок",
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "Cpm": {
+                        "description": "Размер ставки",
+                        "type": "integer",
+                        "example": 290
+                      }
+                    },
+                    "required": [
+                      "Cpm",
+                      "Count"
+                    ]
+                  }
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/IncorrectParam"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectType"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AmountNotChanged"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RequestBodyProcessError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "operationId": "getAllCpm"
+      },
+      "post": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Изменение ставки у РК",
+        "description": "Изменение ставки у рекламной кампании Доступно для РК в карточке товара, поиске или рекомендациях",
+        "tags": [
+          "Реклама"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "advertId",
+                  "type",
+                  "cpm",
+                  "param"
+                ],
+                "properties": {
+                  "advertId": {
+                    "description": "Идентификатор РК, где меняется ставка",
+                    "type": "integer",
+                    "example": 789
+                  },
+                  "type": {
+                    "description": "Тип РК, где меняется ставка: 5 - реклама в карточке товара 6 - реклама в поиске 7 - реклама в рекомендациях на главной странице",
+                    "type": "integer",
+                    "enum": [
+                      5,
+                      6,
+                      7
+                    ]
+                  },
+                  "cpm": {
+                    "description": "Новое значение ставки",
+                    "type": "integer",
+                    "example": 456
+                  },
+                  "param": {
+                    "description": "Параметр, для которого будет внесено изменение (является значением `subjectId` или `setId` в зависимости от типа РК)",
+                    "type": "integer",
+                    "example": 23
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Размер ставки изменен"
+          },
+          "400": {
+            "description": "Размер ставки не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/IncorrectParam"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectType"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectCpm"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Размер ставки не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RequestBodyProcessError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AmountNotChanged"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "setCpm"
+      }
+    },
+    "/adv/v0/allcpm": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Список ставок по типу размещения РК",
+        "description": "Метод позволяет получить список ставок по типу размещения РК. С помощью этого метода изменить ставку невозможно.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Тип РК: 4 - реклама в каталоге 5 - реклама в карточке товара 6 - реклама в поиске 7 - реклама в рекомендациях на главной странице",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                4,
+                5,
+                6,
+                7
+              ]
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "param": {
+                    "description": "Массив параметров запроса, по которым будет получен список ставок активных РК: должен быть значением `menuId` (для РК в каталоге), `subjectId` (для РК в поиске и рекомендациях) или `setId` (для РК в карточке товара).",
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "param": [
+                  699,
+                  344,
+                  385
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "param": {
+                        "description": "Значение параметра (param) запроса",
+                        "type": "integer"
+                      },
+                      "cpm": {
+                        "description": "Информация о ставке(-ах)",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "Cpm": {
+                              "description": "Размер ставки",
+                              "type": "integer"
+                            },
+                            "Count": {
+                              "description": "Количество ставок",
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "Cpm",
+                            "Count"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "param",
+                      "cpm"
+                    ]
+                  }
+                },
+                "example": [
+                  {
+                    "param": 344,
+                    "cpm": [
+                      {
+                        "Cpm": 235,
+                        "Count": 1
+                      }
+                    ]
+                  },
+                  {
+                    "param": 385,
+                    "cpm": [
+                      {
+                        "Cpm": 187,
+                        "Count": 1
+                      },
+                      {
+                        "Cpm": 185,
+                        "Count": 2
+                      },
+                      {
+                        "Cpm": 179,
+                        "Count": 2
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "description": "Неверная форма запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RequestBodyProcessError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "allCpmByType"
+      }
+    },
+    "/adv/v0/active": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Изменение активности предметной группы для РК в поиске",
+        "description": "Метод позволяет изменить активность предметной группы для рекламы в поиске. Изменение активности доступно только для РК в статусе 9 или 11.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор РК",
+            "schema": {
+              "type": "integer",
+              "example": 1234
+            },
+            "required": true
+          },
+          {
+            "name": "subjectId",
+            "in": "query",
+            "description": "Идентификатор предметной группы, для которой меняется активность",
+            "schema": {
+              "type": "integer",
+              "example": 1234
+            },
+            "required": true
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Новое состояние (`true` - сделать группу активной или `false` - сделать группу неактивной)",
+            "schema": {
+              "type": "boolean",
+              "example": "true"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Статус изменен"
+          },
+          "400": {
+            "description": "Статус не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/IncorrectActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectStatus"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidRcId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSubjectID"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Размер ставки не изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivitySubjectGroupNotChanged"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "changeActiveSubjectIdRk"
+      }
+    },
+    "/adv/v0/rename": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Переименование РК",
+        "description": "Метод позволяет переименовать рекламную кампанию.",
+        "tags": [
+          "Реклама"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "advertId",
+                  "name"
+                ],
+                "properties": {
+                  "advertId": {
+                    "type": "integer",
+                    "description": "Идентификатор РК, у которой меняется название"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Новое название (максимум 100 символов)"
+                  }
+                }
+              },
+              "example": {
+                "advertId": 2233344,
+                "name": "newnmame"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Статус изменен"
+          },
+          "400": {
+            "description": "Неверная форма запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvalidRcId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectName"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/RequestBodyProcessError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CompanyNameChangeErr"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "operationId": "renameRk"
+      }
+    },
+    "/adv/v0/intervals": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Изменение интервалов показа РК",
+        "description": "Метод позволяет изменить временной интервал показа рекламной кампании.",
+        "tags": [
+          "Реклама"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "advertId",
+                  "type",
+                  "intervals",
+                  "param"
+                ],
+                "properties": {
+                  "advertId": {
+                    "type": "integer",
+                    "description": "Идентификатор РК, у которой меняется бюджет"
+                  },
+                  "intervals": {
+                    "description": "Массив новых значений для интервалов. Максимальное количество интервалов `24`.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "begin": {
+                          "type": "integer",
+                          "description": "Время начала показов, по 24 часовой схеме (\"begin\": 15)"
+                        },
+                        "end": {
+                          "type": "integer",
+                          "description": "Время окончания показов, по 24 часовой схеме (\"end\": 21)"
+                        }
+                      }
+                    }
+                  },
+                  "param": {
+                    "type": "integer",
+                    "description": "Параметр, для которого будет внесено изменение, должен быть значением `menuId` (для РК в каталоге), `subjectId` (для РК в поиске и рекомендациях) или `setId` (для РК в карточке товара)"
+                  }
+                }
+              },
+              "example": {
+                "advertId": 3344123,
+                "intervals": [
+                  {
+                    "begin": 3,
+                    "end": 5
+                  },
+                  {
+                    "begin": 19,
+                    "end": 21
+                  }
+                ],
+                "param": 275
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Статус изменен"
+          },
+          "400": {
+            "description": "Неверная форма запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvalidRcId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectParam"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectNumDisplayIntervals"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectDisplayInterval"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/CampaignIntervalsNotChanged"
+                    },
+                    {
+                      "$ref": "#/components/schemas/DisplayIntervalError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RequestBodyProcessError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "operationId": "setIntervalsRk"
+      }
+    },
+    "/adv/v0/nmactive": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "post": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Изменение активности номенклатур РК",
+        "description": "Метод позволяет изменить активность номенклатур в РК.",
+        "tags": [
+          "Реклама"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "advertId",
+                  "active",
+                  "param"
+                ],
+                "properties": {
+                  "advertId": {
+                    "type": "integer",
+                    "description": "Идентификатор РК"
+                  },
+                  "active": {
+                    "description": "Массив значений активности для номенклатур. Максимальноe количество номенклатур в запросе `50`.",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "nm": {
+                          "type": "integer",
+                          "description": "Артикул WB (`nmId`)"
+                        },
+                        "active": {
+                          "type": "boolean",
+                          "description": "Новое состояние (`true` - сделать номенклатуру активной или `false` - сделать номенклатуру неактивной)"
+                        }
+                      },
+                      "required": [
+                        "nm",
+                        "active"
+                      ]
+                    }
+                  },
+                  "param": {
+                    "type": "integer",
+                    "description": "Параметр, для которого будет внесено изменение, должен быть значением `menuId` (для РК в каталоге), `subjectId` (для РК в поиске и рекомендациях) или `setId` (для РК в карточке товара)."
+                  }
+                }
+              },
+              "example": {
+                "advertId": 456789,
+                "active": [
+                  {
+                    "nm": 2116745,
+                    "active": true
+                  },
+                  {
+                    "nm": 301402,
+                    "active": true
+                  }
+                ],
+                "param": 275
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Статус изменен"
+          },
+          "400": {
+            "description": "Неверная форма запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/InvalidRcId"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectParam"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectActive"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectNumItems"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectNm"
+                    },
+                    {
+                      "$ref": "#/components/schemas/IncorrectSupplierId"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ActivityNomNotChanged"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RequestBodyProcessError"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "operationId": "setNmActiveRk"
+      }
+    },
+    "/adv/v0/params/subject": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Словарь значений параметра subjectId",
+        "description": "Метод позволяет получить список значений параметра subjectId.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор предметной группы, для которой создана РК (для РК в поиске и рекомендациях). Принимает значение параметра `subjectId` из РК. При пустом параметре вернётся весь список существующих значений.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "description": "Значение для параметра `subjectId`",
+                        "type": "integer"
+                      },
+                      "name": {
+                        "description": "Название предметной группы, для которой создана РК",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name"
+                    ]
+                  }
+                },
+                "example": [
+                  {
+                    "id": 699,
+                    "name": "Гелевые полоски"
+                  },
+                  {
+                    "id": 12345,
+                    "name": "Гелевые кружочки"
+                  }
+                ]
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncorrectSupplierId"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getSubjectIdDict"
+      }
+    },
+    "/adv/v0/params/menu": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Словарь значений параметра menuId",
+        "description": "Метод позволяет получить список значений параметра menuId.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор меню, где размещается РК (для РК в каталоге). Принимает значение параметра `menuId` из РК. При пустом параметре вернётся весь список существующих значений.",
+            "schema": {
+              "type": "integer",
+              "example": 8967
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "description": "Значение для параметра `menuId`",
+                        "type": "integer"
+                      },
+                      "name": {
+                        "description": "Название меню, где размещается РК",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name"
+                    ]
+                  }
+                },
+                "example": [
+                  {
+                    "id": 8967,
+                    "name": "Уход за кожей"
+                  }
+                ]
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncorrectSupplierId"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getMenuIdDict"
+      }
+    },
+    "/adv/v0/params/set": {
+      "servers": [
+        {
+          "url": "https://advert-api.wb.ru"
+        }
+      ],
+      "get": {
+        "security": [
+          {
+            "HeaderApiKey": []
+          }
+        ],
+        "summary": "Словарь значений параметра setId",
+        "description": "Метод позволяет получить список значений параметра setId.",
+        "tags": [
+          "Реклама"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Идентификатор сочетания предмета и пола (для РК в карточке товара). Принимает значение параметра `setId` из РК. При пустом параметре вернётся весь список существующих значений.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "description": "Значение для параметра `setId`",
+                        "type": "integer"
+                      },
+                      "name": {
+                        "description": "Сочетание предмета и пола",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name"
+                    ]
+                  }
+                },
+                "example": [
+                  {
+                    "id": 477,
+                    "name": "Подушки для малышей"
+                  },
+                  {
+                    "id": 744,
+                    "name": "Хлопушки для малышей"
+                  }
+                ]
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncorrectSupplierId"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/TokenMissing"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenInvalid"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TokenNotFound"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getSetIdDict"
+      }
+    }
+  }
+}

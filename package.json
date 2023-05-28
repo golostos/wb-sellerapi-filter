@@ -1,0 +1,11 @@
+{
+  "name": "wb-sellerapi-filter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "node index.js"
+  },
+  "author": "Alexander Dmitriev",
+  "license": "ISC",
+  "description": "Fixes for official WB Seller API (only avd)"
+}
